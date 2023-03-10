@@ -51,7 +51,7 @@ void Map::calUserPosition(bool* up, bool* down) {
 		in_terrain = true;
 
 	if (*up) {
-		if (cnt_jmp < 0.25) {
+		if (cnt_jmp < 0.35) {
 			user->setY(user->getY() + 0.01);
 			cnt_jmp += 0.01;
 		}
@@ -62,7 +62,7 @@ void Map::calUserPosition(bool* up, bool* down) {
 		}
 	}
 	else if (*down) {
-		if (cnt_jmp < 0.25) {
+		if (cnt_jmp < 0.35) {
 			if (!in_terrain) {
 				user->setY(user->getY() - 0.01);
 			}
@@ -103,7 +103,9 @@ void Map::newTerrainBlock() {
 		if (!terrain_blocks.empty() && !terrain_blocks.back()->getExist())
 			tb->setExist(true);
 		else
-			tb->setExist(rand() % 2);
+			if(rand() % 4 >= 1) tb->setExist(true);
+			else tb->setExist(false);
+			//블럭 없어질 확률을 1/4로 하향
 
 		cnt_new_tb = 0;
 		terrain_blocks.push_back(tb);
@@ -138,7 +140,7 @@ void Map::newFireBall() {
 			iter++;
 	}
 
-	if (rand() / (double)RAND_MAX * 100.0 < 1.0) {
+	if (rand() / (double)RAND_MAX * 100.0 < 0.2) { //파이어볼 생성 확률 하향
 		FireBall* fb = new FireBall();
 		fb->setX(user->getX() + 0.9);
 
@@ -176,6 +178,79 @@ bool Map::checkFireBall() {
 			if (user_y1 < fb_y2 && fb_y2 <= user_y2)
 				return true;
 		}
+	return false;
+}
+
+deque<Coin*> Map::getCoins() { return coins; }
+
+void Map::calCoin() {
+	deque<Coin*>::iterator iter = coins.begin();
+	while (!coins.empty() && iter != coins.end()) {
+		Coin* c = *iter;
+		float c_x = c->getX();
+		if (c_x < user->getX() - 0.2) {
+			Coin* rmv = *iter;
+			iter++;
+			coins.pop_front();
+			delete rmv;
+		}
+		else
+			iter++;
+	}
+
+	if (rand() / (double)RAND_MAX * 100.0 < 1 && coins.size() < 10) {
+		Coin* c = new Coin();
+		c->setX(user->getX() + 0.9);
+		if(rand() % 3 == 0) c->setY(c->getY() + 0);
+		else if (rand() % 3 == 1) c->setY(c->getY() + 0.25);
+		else c->setY(c->getY() + 0.45);
+		//Set 3 kinds of height where coins to be placed
+		coins.push_back(c);
+	}
+}
+
+void Map::drawCoins() {
+	for (int i = 0; i < coins.size(); i++)
+		coins[i]->draw();
+}
+
+bool Map::EatCoin() { //Check whether user contacts with coin or not, and erase the eaten coin
+	deque<Coin*>::iterator iter = coins.begin();
+	int count = 0;
+	while (!coins.empty() && iter != coins.end()) {
+		Coin* c = *iter;
+		float c_x = c->getX();
+		float c_y = c->getY();
+		if (c_x >= user->getX() && c_x <= user->getX() + user->getW()) {
+			if (c_y >= user->getY() && c_y <= user->getY() + user->getH()) {
+				coins.erase(coins.begin() + count);
+				return true;
+			}
+		}
+		c_x += c->getH();
+		if (c_x >= user->getX() && c_x <= user->getX() + user->getW()) {
+			if (c_y >= user->getY() && c_y <= user->getY() + user->getH()) {
+				coins.erase(coins.begin() + count);
+				return true;
+			}
+		}
+		c_x = c->getX();
+		c_y += c->getH();
+		if (c_x >= user->getX() && c_x <= user->getX() + user->getW()) {
+			if (c_y >= user->getY() && c_y <= user->getY() + user->getH()) {
+				coins.erase(coins.begin() + count);
+				return true;
+			}
+		}
+		c_x += c->getH();
+		if (c_x >= user->getX() && c_x <= user->getX() + user->getW()) {
+			if (c_y >= user->getY() && c_y <= user->getY() + user->getH()) {
+				coins.erase(coins.begin() + count);
+				return true;
+			}
+		}
+		iter++;
+		count++;
 	}
 	return false;
 }

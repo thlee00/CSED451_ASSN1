@@ -54,4 +54,11 @@ public:
 	bool getElev();
 	void draw();
 };
+
+class Coin : public RectObj {
+private:
+public:
+	Coin();
+	void draw();
+};
 #endif

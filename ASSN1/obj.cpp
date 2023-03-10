@@ -34,7 +34,7 @@ void RectObj::draw() {
 
 
 User::User() {
-	x = 0.1, y = 0.2, w = 0.1, h = 0.3;
+	x = 0.1, y = 0.2, w = 0.06, h = 0.2;
 }
 
 void User::draw() {
@@ -86,4 +86,13 @@ void FireBall::draw() {
 	glVertex2f(x + w, y + h);
 	glVertex2f(x + w, y);
 	glEnd();
+}
+
+Coin::Coin() {
+	x = 0.0, y = 0.2, w = 0.025, h = 0.05;
+}
+
+void Coin::draw() {
+	glColor3f(1.0, 1.0, 0.0);
+	RectObj::draw();
 }
