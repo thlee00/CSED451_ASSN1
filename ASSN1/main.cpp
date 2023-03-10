@@ -67,10 +67,13 @@ void display() {
 	*/
 
 	if (end_condition) {
+		exit(0);
+		/*
 		RectObj ending;
 		ending.set(0.3, 0.3, 0.4, 0.4);
 		glColor3f(0.0, 0.5, 0.5);
 		ending.draw();
+		*/
 	}
 
 	glutSwapBuffers();
@@ -100,12 +103,12 @@ void mouse(int button, int state, int x, int y) {
 void timer(int value) {
 	map->calUserPosition(&up, &down);
 
-	position += 0.01;
+	position = map->getUser()->getX()-0.1;
 
-	end_condition = map->calEndCondition();
+	end_condition = map->checkEndCondition();
 
-	map->calTerrainBlock();
-	map->calFireBall();
+	map->newTerrainBlock();
+	map->newFireBall();
 
 	reshape(1000, 500);
 	//User & Camera Move
