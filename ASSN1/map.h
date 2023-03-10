@@ -22,13 +22,15 @@ public:
 	void init();
 	User* getUser();
 	void drawUser();
+	void findLRTerrainBlocks(TerrainBlock** left_tb, TerrainBlock** right_tb);
 	void calUserPosition(bool* up, bool* down);
 	deque<TerrainBlock*> getTerrainBlocks();
-	void calTerrainBlock();
+	void newTerrainBlock();
 	void drawTerrainBlocks();
 	deque<FireBall*> getFireBalls();
-	void calFireBall();
+	void newFireBall();
 	void drawFireBalls();
-	bool calEndCondition();
+	bool checkFireBall();
+	bool checkEndCondition();
 };
 #endif
