@@ -16,19 +16,26 @@ private:
 	User *user;
 	deque<TerrainBlock*> terrain_blocks;
 	deque<FireBall*> fire_balls;
+	deque<Coin*> coins;
 
 public:
 	Map();
 	void init();
 	User* getUser();
 	void drawUser();
+	void findLRTerrainBlocks(TerrainBlock** left_tb, TerrainBlock** right_tb);
 	void calUserPosition(bool* up, bool* down);
 	deque<TerrainBlock*> getTerrainBlocks();
-	void calTerrainBlock();
+	void newTerrainBlock();
 	void drawTerrainBlocks();
 	deque<FireBall*> getFireBalls();
-	void calFireBall();
+	void newFireBall();
 	void drawFireBalls();
-	bool calEndCondition();
+	bool checkFireBall();
+	deque<Coin*> getCoins();
+	void calCoin();
+	void drawCoins();
+	bool EatCoin();
+	bool checkEndCondition();
 };
 #endif
