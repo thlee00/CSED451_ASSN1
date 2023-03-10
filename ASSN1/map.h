@@ -16,6 +16,7 @@ private:
 	User *user;
 	deque<TerrainBlock*> terrain_blocks;
 	deque<FireBall*> fire_balls;
+	deque<Coin*> coins;
 
 public:
 	Map();
@@ -29,6 +30,10 @@ public:
 	deque<FireBall*> getFireBalls();
 	void calFireBall();
 	void drawFireBalls();
+	deque<Coin*> getCoins();
+	void calCoin();
+	void drawCoins();
+	bool EatCoin();
 	bool calEndCondition();
 };
 #endif

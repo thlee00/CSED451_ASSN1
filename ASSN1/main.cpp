@@ -9,6 +9,8 @@
 #include "map.h"
 #include "obj.h"
 
+#define SCORE_MAX 999999 //MAXIMUM Score
+
 using namespace std;
 
 void display();
@@ -18,8 +20,10 @@ void timer(int value);
 
 bool up = false;
 bool down = false;
-int score = 0;
-double position = 0;
+bool eat = false; //Is user contact with coin?
+int score = 0; //Score INT value
+char scorebox[6] = {0 + '0',0 + '0', 0 + '0', 0 + '0', 0 + '0', 0 + '0'}; //Score box character
+double position = 0; //Camera & Score box position
 
 Map* map;
 bool end_condition = false;
@@ -45,6 +49,7 @@ void display() {
 	map->drawUser();
 	map->drawTerrainBlocks();
 	map->drawFireBalls();
+	map->drawCoins(); //Draw Coins
 
 	glColor3f(0.0, 0.0, 0.0);
 	glBegin(GL_LINE_LOOP);
@@ -53,18 +58,14 @@ void display() {
 	glVertex2f(0.97 + position, 0.95);
 	glVertex2f(0.97 + position, 0.85);
 	glEnd();
-	//Score Board
+	//Score Board Move
 
-	/*
-	if (score > 999999) score = 999999;
 	for (int i = 1; i <= 6; i++) {
 		glColor3f(0.0, 0.0, 0.0);
 		glRasterPos2f(0.95 + position - 0.01 * i, 0.89);
-		glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, score % 10 + '0');
-		score /= 10;
+		glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, scorebox[i-1]);
 	}
-	//Score
-	*/
+	//Print Real-time score
 
 	if (end_condition) {
 		RectObj ending;
@@ -99,19 +100,30 @@ void mouse(int button, int state, int x, int y) {
 
 void timer(int value) {
 	map->calUserPosition(&up, &down);
+	//User move & jump
 
 	position += 0.01;
+	//Camera & Score box position update
 
 	end_condition = map->calEndCondition();
 
 	map->calTerrainBlock();
 	map->calFireBall();
+	map->calCoin();
+
+	eat = map->EatCoin();
+	if (eat && score < SCORE_MAX) {
+		score += 1;
+		int tmp = score;
+		for (int i = 0; i < 6; i++) {
+			scorebox[i] = tmp % 10 + '0';
+			tmp /= 10;
+		}
+	}
+	//If user eats coin, increase and update score.
 
 	reshape(1000, 500);
-	//User & Camera Move
-
-	score++;
-	//Score
+	//Camera Move
 
 	glutPostRedisplay();
 	glutTimerFunc(1, timer, 1);
