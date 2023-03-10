@@ -7,11 +7,14 @@ using namespace std;
 
 class Map {
 private:
-	int cnt_new_block;
+	float cnt_jmp;
+	int cnt_new_tb;
+	int cnt_new_fb;
 	float block_x;
+	float fb_x;
 
 	User *user;
-	deque<Block*> blocks;
+	deque<TerrainBlock*> terrain_blocks;
 	deque<FireBall*> fire_balls;
 
 public:
@@ -19,12 +22,13 @@ public:
 	void init();
 	User* getUser();
 	void drawUser();
-	deque<Block*> getBlocks();
+	void calUserPosition(bool* up, bool* down);
+	deque<TerrainBlock*> getTerrainBlocks();
 	void calTerrainBlock();
 	void drawTerrainBlocks();
 	deque<FireBall*> getFireBalls();
 	void calFireBall();
 	void drawFireBalls();
-	
+	bool calEndCondition();
 };
 #endif

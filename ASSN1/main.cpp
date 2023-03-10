@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <GL/glut.h>
 #include <GL/GL.h>
+#include <GL/GLU.h>
 #include <deque>
 #include <string>
 #include <windows.h>
@@ -21,6 +22,7 @@ int score = 0;
 double position = 0;
 
 Map* map;
+bool end_condition = false;
 
 void init(int argc, char **argv) {
 	glutInit(&argc, argv);
@@ -40,24 +42,6 @@ void init(int argc, char **argv) {
 void display() {
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	glColor3f(0.5882, 0.2941, 0.0);
-	glBegin(GL_POLYGON);
-	glVertex2f(0.0, 0.0);
-	glVertex2f(0.0, 0.18);
-	glVertex2f(1.3, 0.18);
-	glVertex2f(1.3, 0.0);
-	glEnd();
-	//Init Soil
-
-	glColor3f(0.0, 0.502, 0.0);
-	glBegin(GL_POLYGON);
-	glVertex2f(0.0, 0.18);
-	glVertex2f(0.0, 0.2);
-	glVertex2f(1.3, 0.2);
-	glVertex2f(1.3, 0.18);
-	glEnd();
-	//Init Grass
-
 	map->drawUser();
 	map->drawTerrainBlocks();
 	map->drawFireBalls();
@@ -70,6 +54,7 @@ void display() {
 	glVertex2f(0.97 + position, 0.85);
 	glEnd();
 	//Score Board
+
 	/*
 	if (score > 999999) score = 999999;
 	for (int i = 1; i <= 6; i++) {
@@ -80,6 +65,14 @@ void display() {
 	}
 	//Score
 	*/
+
+	if (end_condition) {
+		RectObj ending;
+		ending.set(0.3, 0.3, 0.4, 0.4);
+		glColor3f(0.0, 0.5, 0.5);
+		ending.draw();
+	}
+
 	glutSwapBuffers();
 }
 
@@ -96,8 +89,8 @@ void mouse(int button, int state, int x, int y) {
 	if (state == GLUT_DOWN) {
 		if (button == GLUT_LEFT_BUTTON) {
 			if (!up && !down) {
-				float user_y = map->getUser()->getY();
-				map->getUser()->setY(user_y + 0.01);
+				//float user_y = map->getUser()->getY();
+				//map->getUser()->setY(user_y + 0.01);
 				up = true;
 			}
 		}
@@ -105,30 +98,11 @@ void mouse(int button, int state, int x, int y) {
 }
 
 void timer(int value) {
-	if (up == true) {
-		float user_y = map->getUser()->getY();
-		if (user_y > 0.2 && user_y <= 0.45) {
-			map->getUser()->setY(user_y + 0.01);
-		}
-		else if (user_y > 0.45) {
-			up = false;
-			down = true;
-		}
-	}
-	float user_y = map->getUser()->getY();
-	if (down == true) {
-		if (user_y > 0.2) {
-			map->getUser()->setY(user_y - 0.01);
-		}
-		else {
-			down = false;
-		}
-	}
-	//Jump
+	map->calUserPosition(&up, &down);
 
-	float user_x = map->getUser()->getX();
-	map->getUser()->setX(user_x + 0.01);
 	position += 0.01;
+
+	end_condition = map->calEndCondition();
 
 	map->calTerrainBlock();
 	map->calFireBall();

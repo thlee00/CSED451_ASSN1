@@ -1,57 +1,119 @@
 #include "map.h"
 
 Map::Map() {
-	cnt_new_block = 0;
-	block_x = 1.3;
+	cnt_jmp = 0.0;
+	cnt_new_tb = 0;
+	cnt_new_fb = 0;
+	block_x = 0.0;
+	fb_x = 1.0;
 }
 
-/* Initialize all things */
 void Map::init() {
 	user = new User();
-	user->set(0.1, 0.2, 0.1, 0.3);
+	for (int i = 0; i < 5; i++) {
+		TerrainBlock* tb = new TerrainBlock();
+		block_x += 0.3;
+		tb->setX(block_x);
+		terrain_blocks.push_back(tb);
+	}
 }
 
 User* Map::getUser() { return user; }
+
 void Map::drawUser() {
 	user->draw();
 }
 
-deque<Block*> Map::getBlocks() { return blocks; }
+void Map::calUserPosition(bool* up, bool* down) {
+	user->setX(user->getX() + 0.01);
+
+	for (int i = 0; i < terrain_blocks.size(); i++) {
+		TerrainBlock* cur_tb = terrain_blocks[i];
+		if (!cur_tb->getExist() && (cur_tb->getX() - 0.3 <= user->getX() && user->getX() + user->getW() <= cur_tb->getX())) {
+			user->setY(user->getY() - 0.01);
+			break;
+		}
+	}
+
+	if (*up == true) {
+		if (cnt_jmp < 0.25) {
+			user->setY(user->getY() + 0.01);
+			cnt_jmp += 0.01;
+		}
+		else {
+			*up = false;
+			*down = true;
+			cnt_jmp = 0.0;
+		}
+	}
+	else if (*down == true) {
+		if (cnt_jmp < 0.25) {
+			user->setY(user->getY() - 0.01);
+			if (user->getY() < 0.2) {
+				for (int i = 0; i < terrain_blocks.size(); i++) {
+					TerrainBlock* cur_tb = terrain_blocks[i];
+					if (cur_tb->getExist() && (cur_tb->getX() - 0.3 <= user->getX() && user->getX() + user->getW() <= cur_tb->getX())) {
+						user->setY(0.2);
+						break;
+					}
+				}
+			}
+			cnt_jmp += 0.01;
+		}
+		else {
+			cnt_jmp = 0.0;
+			*down = false;
+		}
+	}
+	else {
+		for (int i = 0; i < terrain_blocks.size(); i++) {
+			TerrainBlock* cur_tb = terrain_blocks[i];
+			if (!cur_tb->getExist() && (cur_tb->getX() - 0.3 <= user->getX() && user->getX() + user->getW() <= cur_tb->getX())) {
+				user->setY(user->getY() - 0.01);
+				break;
+			}
+		}
+	}
+}
+
+deque<TerrainBlock*> Map::getTerrainBlocks() { return terrain_blocks; }
+
 void Map::calTerrainBlock() {
-	cnt_new_block++;
+	cnt_new_tb++;
 
-	if (cnt_new_block == 30) {
-		Block* tmp = new Block();
+	if (cnt_new_tb == 30) {
+		TerrainBlock* tb = new TerrainBlock();
 		block_x += 0.3;
-		tmp->setX(block_x);
+		tb->setX(block_x);
 
-		if (!blocks.empty() && !blocks.back()->getExist())
-			tmp->setExist(true);
+		if (!terrain_blocks.empty() && !terrain_blocks.back()->getExist())
+			tb->setExist(true);
 		else
-			tmp->setExist(rand() % 2);
+			tb->setExist(rand() % 2);
 
-		cnt_new_block = 0;
-		blocks.push_back(tmp);
-		if (blocks.size() > 5) {
-			Block* rmv = blocks.front();
-			blocks.pop_front();
+		cnt_new_tb = 0;
+		terrain_blocks.push_back(tb);
+		if (terrain_blocks.size() > 5) {
+			TerrainBlock* rmv = terrain_blocks.front();
+			terrain_blocks.pop_front();
 			delete rmv;
 		}
 	}
 }
 
 void Map::drawTerrainBlocks() {
-	for (int i = 0; i < blocks.size(); i++)
-		blocks[i]->draw();
+	for (int i = 0; i < terrain_blocks.size(); i++)
+		terrain_blocks[i]->draw();
 }
 
 deque<FireBall*> Map::getFireBalls() { return fire_balls; }
+
 void Map::calFireBall() {
 	deque<FireBall*>::iterator iter = fire_balls.begin();
 	while (!fire_balls.empty() && iter != fire_balls.end()) {
 		FireBall* fb = *iter;
 		float fb_x = fb->getX();
-		fb->setX(fb_x -0.005);
+		fb->setX(fb_x - 0.005);
 		if (fb_x < user->getX() - 0.2) {
 			FireBall* rmv = *iter;
 			iter++;
@@ -66,7 +128,7 @@ void Map::calFireBall() {
 		FireBall* fb = new FireBall();
 		fb->setX(user->getX() + 0.9);
 
-		if (!blocks.empty() && ((blocks.back()->getX() >= fb->getX() && !blocks.back()->getExist())))
+		if (!terrain_blocks.empty() && ((terrain_blocks.back()->getX() >= fb->getX() && !terrain_blocks.back()->getExist())))
 			fb->setElev(false);
 		else if (!fire_balls.empty() && !fire_balls.back()->getElev())
 			fb->setElev(true);
@@ -82,3 +144,7 @@ void Map::drawFireBalls() {
 		fire_balls[i]->draw();
 }
 
+bool Map::calEndCondition() {
+	///if()
+	return false;
+}

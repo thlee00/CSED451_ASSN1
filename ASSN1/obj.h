@@ -4,12 +4,13 @@
 
 class RectObj {
 private:
-	float w;
-	float h;
+	;
 
 protected:
 	float x;
 	float y;
+	float w;
+	float h;
 
 public:
 	RectObj();
@@ -18,23 +19,26 @@ public:
 	void setY(float _y);
 	float getX();
 	float getY();
+	float getW();
+	float getH();
 	void draw();
 };
 
 class User : public RectObj {
 private:
 	;
+
 public:
 	User();
 	void draw();
 };
 
-class Block : public RectObj {
+class TerrainBlock : public RectObj {
 private:
 	bool exist;
 
 public:
-	Block();
+	TerrainBlock();
 	void setExist(bool e);
 	bool getExist();
 	void draw();
