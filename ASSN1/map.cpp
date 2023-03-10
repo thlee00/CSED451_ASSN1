@@ -178,6 +178,7 @@ bool Map::checkFireBall() {
 			if (user_y1 < fb_y2 && fb_y2 <= user_y2)
 				return true;
 		}
+	}
 	return false;
 }
 
