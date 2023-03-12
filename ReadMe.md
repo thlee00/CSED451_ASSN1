@@ -27,17 +27,18 @@
   |--lib
   | `--glut32.lib
   |
-  |--glut32.dull
+  |--glut32.dll
   |--main.cpp
+  |--map.cpp
   |--map.h
   |--obj.cpp
   `--obj.h
 ```
 
-- include, lib 폴더와 glut32.dll: GLUT (3.7.6 ver)
+- include/GL/glut.h, lib/glut32.lib glut32.dll: GLUT (3.7.6 ver)
 - main.cpp: 프로그램 메인 구동이 담긴 코드
 - map.h, map.cpp: 맵 구성과 캐릭터 이동, 오브젝트 생성 알고리즘이 담긴 코드
-- obj.h, obj.h: 지표면 블록, 파이어볼, 코인, 캐릭터 등의 오브젝트 클래스를 정의하고 상속하는 코드
+- obj.h, obj.cp: 지표면 블록, 파이어볼, 코인, 캐릭터 등의 오브젝트 클래스를 정의하고 상속하는 코드
 
 ## 실행 방법
 1. repository clone
