@@ -35,6 +35,7 @@ void RectObj::draw() {
 
 User::User() {
 	x = 0.1, y = 0.2, w = 0.06, h = 0.2;
+	InTerrain = true;
 }
 
 void User::draw() {
@@ -42,10 +43,13 @@ void User::draw() {
 	RectObj::draw();
 }
 
+void User::setInTerrain(bool i) { InTerrain = i; }
+bool User::getInTerrain() { return InTerrain; }
+
 
 TerrainBlock::TerrainBlock() {
 	x = 0.0, y = 0.0, w = 0.3, h = 0.2;
-	bool exist = true;
+	exist = true;
 }
 void TerrainBlock::setExist(bool e) { exist = e; }
 bool TerrainBlock::getExist() { return exist; }
@@ -73,7 +77,7 @@ void TerrainBlock::draw() {
 
 FireBall::FireBall() {
 	x = 0.0, y = 0.0, w = 0.05, h = 0.1;
-	bool elev = false;
+	elev = false;
 }
 void FireBall::setElev(bool e) { elev = e; }
 bool FireBall::getElev() { return elev; }
