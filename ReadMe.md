@@ -43,7 +43,7 @@
 ## 실행 방법
 1. repository clone
 2. Visual Studio 2019 solution 파일 (assn1.sln) 실행
-3. F5 키로 code complie
-4. 콘솔에서 게임 시작
+3. F5 키로 main.cpp complie
+4. 콘솔 화면에서 게임 시작
 5. 코인 획득 시 점수 상승
 6. 구덩이나 파이어볼을 피하지 못하면 프로그램 종료
