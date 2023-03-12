@@ -12,6 +12,7 @@ private:
 	int cnt_new_fb;
 	float block_x;
 	float fb_x;
+	bool EndCondition;
 
 	User *user;
 	deque<TerrainBlock*> terrain_blocks;
@@ -33,9 +34,11 @@ public:
 	void drawFireBalls();
 	bool checkFireBall();
 	deque<Coin*> getCoins();
-	void calCoin();
+	void newCoin();
 	void drawCoins();
 	bool EatCoin();
+	void setEndCondition(bool e);
+	bool getEndCondition();
 	bool checkEndCondition();
 };
 #endif

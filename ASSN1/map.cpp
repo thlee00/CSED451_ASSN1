@@ -6,10 +6,12 @@ Map::Map() {
 	cnt_new_fb = 0;
 	block_x = 0.0;
 	fb_x = 1.0;
+	EndCondition = false;
 }
 
 void Map::init() {
-	user = new User();
+	user = new User(); // Spawn user character
+	// Spawn first 5 terrain blocks
 	for (int i = 0; i < 5; i++) {
 		TerrainBlock* tb = new TerrainBlock();
 		block_x += 0.3;
@@ -25,6 +27,7 @@ void Map::drawUser() {
 }
 
 void Map::findLRTerrainBlocks(TerrainBlock** left_tb, TerrainBlock** right_tb) {
+	// Return the pointer of terrain blocks that locate left/right side of user
 	for (int i = 0; i < terrain_blocks.size(); i++) {
 		float user_x1 = user->getX();
 		float user_x2 = user_x1 + user->getW();
@@ -41,17 +44,20 @@ void Map::findLRTerrainBlocks(TerrainBlock** left_tb, TerrainBlock** right_tb) {
 }
 
 void Map::calUserPosition(bool* up, bool* down) {
-	bool in_terrain = false;
+	user->setInTerrain(false);
 
+	// Find terrain blocks that locate left/right side of user
 	TerrainBlock* cur_left_tb = NULL;
 	TerrainBlock* cur_right_tb = NULL;
 	findLRTerrainBlocks(&cur_left_tb, &cur_right_tb);
 
+	// If left or right block exists, user is 'in the terrain'
 	if (cur_left_tb->getExist() || cur_right_tb->getExist())
-		in_terrain = true;
+		user->setInTerrain(true);
 
 	if (*up) {
-		if (cnt_jmp < 0.35) {
+		// When user jumps, first he goes up
+		if (cnt_jmp < 0.35) { // Maximum jump power: 0.35
 			user->setY(user->getY() + 0.01);
 			cnt_jmp += 0.01;
 		}
@@ -62,8 +68,9 @@ void Map::calUserPosition(bool* up, bool* down) {
 		}
 	}
 	else if (*down) {
+		// After the hightest point, user goes down by gravity
 		if (cnt_jmp < 0.35) {
-			if (!in_terrain) {
+			if (!user->getInTerrain()) {
 				user->setY(user->getY() - 0.01);
 			}
 			else {
@@ -73,19 +80,29 @@ void Map::calUserPosition(bool* up, bool* down) {
 			cnt_jmp += 0.01;
 		}
 		else {
-			cnt_jmp = 0.0;
-			*down = false;
+			if (user->getInTerrain()) {
+				// If user lands on terrain block properly, stop 'jump' action
+				cnt_jmp = 0.0;
+				*down = false;
+			}
+			else {
+				// If user lands on empty space, he falls into hole
+				user->setY(user->getY() - 0.01);
+			}
 		}
 	}
 	else {
-		if (!in_terrain) {
+		if (!user->getInTerrain()) {
+			// When user doesn't jump above the hole, he falls into hole
 			user->setY(user->getY() - 0.01);
 		}
 	}
 	if (cur_right_tb->getExist() && user->getY() < 0.2) {
+		// When user bumps into terrain block's edge, he falls into hole
 		user->setY(user->getY() - 0.01);
 	}
 	else {
+		// User moves in x-axis every 1ms
 		user->setX(user->getX() + 0.01);
 	}
 }
@@ -96,6 +113,7 @@ void Map::newTerrainBlock() {
 	cnt_new_tb++;
 
 	if (cnt_new_tb == 30) {
+		// Spawn new terrain block every 30ms
 		TerrainBlock* tb = new TerrainBlock();
 		block_x += 0.3;
 		tb->setX(block_x);
@@ -103,12 +121,13 @@ void Map::newTerrainBlock() {
 		if (!terrain_blocks.empty() && !terrain_blocks.back()->getExist())
 			tb->setExist(true);
 		else
+			// Probability of spawning hole: 1/4
 			if(rand() % 4 >= 1) tb->setExist(true);
 			else tb->setExist(false);
-			//블럭 없어질 확률을 1/4로 하향
-
 		cnt_new_tb = 0;
 		terrain_blocks.push_back(tb);
+
+		// Remove terrain block which already passed by
 		TerrainBlock* rmv = terrain_blocks.front();
 		if (rmv->getX() < user->getX()) {
 			terrain_blocks.pop_front();
@@ -125,6 +144,7 @@ void Map::drawTerrainBlocks() {
 deque<FireBall*> Map::getFireBalls() { return fire_balls; }
 
 void Map::newFireBall() {
+	// Remove fire balls which already passed by
 	deque<FireBall*>::iterator iter = fire_balls.begin();
 	while (!fire_balls.empty() && iter != fire_balls.end()) {
 		FireBall* fb = *iter;
@@ -140,10 +160,12 @@ void Map::newFireBall() {
 			iter++;
 	}
 
-	if (rand() / (double)RAND_MAX * 100.0 < 0.2) { //파이어볼 생성 확률 하향
+	// Randomly spawn fire balls
+	if (rand() / (double)RAND_MAX * 100.0 < 0.2) {
 		FireBall* fb = new FireBall();
 		fb->setX(user->getX() + 0.9);
 
+		// Fire balls can be spawned in high/low height
 		if (!terrain_blocks.empty() && ((terrain_blocks.back()->getX() >= fb->getX() && !terrain_blocks.back()->getExist())))
 			fb->setElev(false);
 		else if (!fire_balls.empty() && !fire_balls.back()->getElev())
@@ -161,6 +183,7 @@ void Map::drawFireBalls() {
 }
 
 bool Map::checkFireBall() {
+	// Check whether user crashed with fire ball
 	float user_x1 = user->getX();
 	float user_y1 = user->getY();
 	float user_x2 = user_x1 + user->getW();
@@ -184,7 +207,8 @@ bool Map::checkFireBall() {
 
 deque<Coin*> Map::getCoins() { return coins; }
 
-void Map::calCoin() {
+void Map::newCoin() {
+	// Remove coins which already passed by
 	deque<Coin*>::iterator iter = coins.begin();
 	while (!coins.empty() && iter != coins.end()) {
 		Coin* c = *iter;
@@ -198,14 +222,14 @@ void Map::calCoin() {
 		else
 			iter++;
 	}
-
-	if (rand() / (double)RAND_MAX * 100.0 < 1 && coins.size() < 10) {
+	// Randomly spawn coins
+	if (rand() / (double)RAND_MAX * 100.0 < 1) {
 		Coin* c = new Coin();
 		c->setX(user->getX() + 0.9);
+		//Set 3 kinds of height where coins to be placed
 		if(rand() % 3 == 0) c->setY(c->getY() + 0);
 		else if (rand() % 3 == 1) c->setY(c->getY() + 0.25);
 		else c->setY(c->getY() + 0.45);
-		//Set 3 kinds of height where coins to be placed
 		coins.push_back(c);
 	}
 }
@@ -256,7 +280,11 @@ bool Map::EatCoin() { //Check whether user contacts with coin or not, and erase 
 	return false;
 }
 
+void Map::setEndCondition(bool e) { EndCondition = e; }
+bool Map::getEndCondition() { return EndCondition; }
+
 bool Map::checkEndCondition() {
+	// 2 end condition: fall into hole, or crash into fire ball
 	if (user->getY() + user->getH() <= 0.0)
 		return true;
 	return checkFireBall();

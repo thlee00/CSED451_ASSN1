@@ -26,11 +26,13 @@ public:
 
 class User : public RectObj {
 private:
-	;
+	bool InTerrain;
 
 public:
 	User();
 	void draw();
+	void setInTerrain(bool i);
+	bool getInTerrain();
 };
 
 class TerrainBlock : public RectObj {
