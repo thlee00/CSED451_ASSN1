@@ -117,7 +117,7 @@ void timer(int value) {
 	reshape(1000, 500); // Camera move
 
 	glutPostRedisplay();
-	glutTimerFunc(1, timer, 1);	// Repeat every 1ms
+	glutTimerFunc(5, timer, 1);	// Repeat every 1ms
 }
 
 int main(int argc, char** argv) {
@@ -126,7 +126,7 @@ int main(int argc, char** argv) {
 	glutDisplayFunc(display);
 	glutReshapeFunc(reshape);
 	glutMouseFunc(mouse);
-	glutTimerFunc(1, timer, 1);
+	glutTimerFunc(5, timer, 1);
 	glutMainLoop();
 	return 0;
 }
